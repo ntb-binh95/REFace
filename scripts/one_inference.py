@@ -53,6 +53,9 @@ import torch.nn as nn
 # cos = nn.CosineSimilarity(dim=0)
 import numpy as np  
 
+# custom exception
+from src.utils.exception import NoFaceException
+
 # load safety model
 safety_model_id = "CompVis/stable-diffusion-safety-checker"
 safety_feature_extractor = AutoFeatureExtractor.from_pretrained(safety_model_id)
@@ -462,7 +465,9 @@ def process_images(image1, image2, steps=50, scale=3.5):
     Target.save('examples/FaceSwap/One_target/target.jpg')
     
     # Run inference (custom function for face swapping)
-    run_inference(scale=scale, steps=steps)
+    error = run_inference(scale=scale, steps=steps)
+    if isinstance(error, NoFaceException):
+        return error
     
     # Load the output image from the results
     new_image = Image.open('examples/FaceSwap/One_output/results/results/0/000000000000.png')
@@ -508,7 +513,15 @@ def process_images_endpoint():
 
     # Process images
     output_image_io = process_images(image1, image2, steps=int(steps), scale=float(scale))
-    output_image = base64.b64encode(output_image_io.getvalue()).decode('utf-8')
+    # check if there any error, no face for now
+    if isinstance(output_image_io, NoFaceException):
+        return jsonify({
+            'input_image1': f"data:image/jpeg;base64,{input_image1}",
+            'input_image2': f"data:image/jpeg;base64,{input_image2}",
+            'no_face_error': "Please input source image with face"
+        })
+    else:
+        output_image = base64.b64encode(output_image_io.getvalue()).decode('utf-8')
 
     # Return input and output images in base64 format
     return jsonify({
@@ -562,7 +575,10 @@ def run_inference(scale=3.5, steps=50):
             Image.fromarray(mask).save(os.path.join(source_mask_path , f'{str(i)}.png'))
             # save T
             T.save(os.path.join(source_cropped_path, f'{str(i)}.png'))
-        except:
+        except NoFaceException as nf:
+            return nf
+        except Exception as e:
+            print(e)
             print(f"Error in {im}")
             # if error do not skip i
             reset_cnt+=1

@@ -320,6 +320,8 @@
                 // Set the href for download link and make it visible
                 downloadLink.href = result.output_image_url;  // Set the URL for download
                 downloadLink.style.display = 'block';  // Show the download link
+            } else if (result.no_face_error) {
+                outputImage.textContent = 'Please input source image with face'; // Error of no face
             }
 
             // Hide loading spinner

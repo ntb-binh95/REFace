@@ -13,6 +13,7 @@ from scipy.ndimage import gaussian_filter1d
 from tqdm import tqdm
 import cv2
 import dlib
+from src.utils.exception import NoFaceException
 
 
 def rect_to_bb(rect):
@@ -148,7 +149,7 @@ def crop_image(filepath, output_size, quad, enable_padding=False):
 def compute_transform(filepath, predictor, detector=None, scale=1.0, fa=None):
     lm = get_landmark(filepath, predictor, detector, fa)
     if lm is None:
-        raise Exception(f'Did not detect any faces in image: {filepath}')
+        raise NoFaceException(f'Did not detect any faces in image: {filepath}')
     lm_chin = lm[0: 17]  # left-right
     lm_eyebrow_left = lm[17: 22]  # left-right
     lm_eyebrow_right = lm[22: 27]  # left-right

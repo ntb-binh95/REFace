@@ -4,10 +4,10 @@ name="One_output"
 Results_dir="examples/FaceSwap/${name}/results"
 Base_dir="examples/FaceSwap/${name}/Outs"
 Results_out="examples/FaceSwap/${name}/results/results" 
-device=6
+device=0
 
 CONFIG="models/REFace/configs/project_ffhq.yaml"
-CKPT="models/REFace/checkpoints/saved.ckpt"
+CKPT="models/REFace/checkpoints/last.ckpt"
 
 #change this
 target_path="examples/FaceSwap/One_target"  
@@ -27,6 +27,4 @@ CUDA_VISIBLE_DEVICES=${device} python scripts/one_inference.py \
     --n_samples 1 \
     --scale 3.5 \
     --ddim_steps 50
-
-
 
