@@ -827,6 +827,4 @@ def run_inference(scale=3.5, steps=50):
 
 
 if __name__ == "__main__":
-    app.run(debug=False, host='0.0.0.0')
-
-
+    app.run(debug=False, host='0.0.0.0', port=5001)
